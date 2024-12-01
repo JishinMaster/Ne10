@@ -62,13 +62,21 @@ typedef float32x4_t   REAL;
         vst2q_f32 ((ne10_float32_t*) (PTR), OUT); \
     } while (0)
 
+#ifdef __SSE2__
+#define f32x2_0(a) a.m64_f32[0]
+#define f32x2_1(a) a.m64_f32[1]
+#else
+#define f32x2_0(a) a[0]
+#define f32x2_1(a) a[1]
+#endif
+
 static inline void NE10_LOAD_TW_AND_MUL (CPLX &scratch_in,
         const ne10_fft_cpx_float32_t *ptr_in)
 {
     CPLX scratch_tw;
     float32x2_t d2_tmp = vld1_f32 ((ne10_float32_t *)ptr_in);
-    scratch_tw.val[0] = NE10_REAL_DUP_NEON_F32 (d2_tmp[0]);
-    scratch_tw.val[1] = NE10_REAL_DUP_NEON_F32 (d2_tmp[1]);
+    scratch_tw.val[0] = NE10_REAL_DUP_NEON_F32 (f32x2_0(d2_tmp));
+    scratch_tw.val[1] = NE10_REAL_DUP_NEON_F32 (f32x2_1(d2_tmp));
     NE10_CPX_MUL_NEON_F32 (scratch_in, scratch_in, scratch_tw);
 }
 
@@ -427,7 +435,7 @@ static void ne10_radix_2_butterfly_float32_neon (CPLX *Fout,
     ne10_int32_t f_count;
     ne10_int32_t m_count;
 
-    const REAL one_by_fft_neon = NE10_REAL_DUP_NEON_F32 (0.25 / nfft);
+    const REAL one_by_fft_neon = NE10_REAL_DUP_NEON_F32 (0.25f / nfft);
 
     for (f_count = fstride; f_count > 0; f_count--)
     {
@@ -577,7 +585,7 @@ static void ne10_radix_4_butterfly_float32_neon (CPLX *Fout,
     ne10_int32_t f_count;
     ne10_int32_t m_count;
 
-    const REAL one_by_fft_neon = NE10_REAL_DUP_NEON_F32 (0.25 / nfft);
+    const REAL one_by_fft_neon = NE10_REAL_DUP_NEON_F32 (0.25f / nfft);
 
     for (f_count = fstride; f_count > 0; f_count--)
     {
@@ -807,7 +815,7 @@ static void ne10_radix_3_butterfly_float32_neon (CPLX *Fout,
     ne10_int32_t f_count;
     ne10_int32_t m_count;
 
-    const REAL one_by_fft_neon = NE10_REAL_DUP_NEON_F32 (0.25 / nfft);
+    const REAL one_by_fft_neon = NE10_REAL_DUP_NEON_F32 (0.25f / nfft);
     const float32x4_t TW_3IN_NEON_F32 = vdupq_n_f32 (TW_3IN_F32);
     const float32x4_t HALF_NEON_F32 = vdupq_n_f32 (0.5f);
 
@@ -1032,7 +1040,7 @@ static void ne10_radix_5_butterfly_float32_neon (CPLX *Fout,
     ne10_int32_t f_count;
     ne10_int32_t m_count;
 
-    const REAL one_by_fft_neon = NE10_REAL_DUP_NEON_F32 (0.25 / nfft);
+    const REAL one_by_fft_neon = NE10_REAL_DUP_NEON_F32 (0.25f / nfft);
 
     for (f_count = fstride; f_count > 0; f_count--)
     {
@@ -1144,7 +1152,7 @@ static void ne10_radix_8_butterfly_float32_neon (CPLX *Fout,
     ne10_int32_t f_count;
     ne10_int32_t m_count;
 
-    const REAL one_by_fft_neon = NE10_REAL_DUP_NEON_F32 (0.25 / nfft);
+    const REAL one_by_fft_neon = NE10_REAL_DUP_NEON_F32 (0.25f / nfft);
 
     for (f_count = fstride; f_count > 0; f_count--)
     {

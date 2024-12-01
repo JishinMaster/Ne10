@@ -46,6 +46,7 @@ int main(void)
 {
     printf("==== Ne10 Samples ===\n\n");
 
+#ifdef NE10_ENABLE_MATH
     printf("# Introduction\n");
     intro_sample_main();
     printf("\n");
@@ -53,7 +54,7 @@ int main(void)
     printf("# Matrix Multiply\n");
     matrix_multiply_sample_main();
     printf("\n");
-
+#endif
     printf("# Complex-to-Complex FFT\n");
     complex_fft_sample_main();
     printf("\n");

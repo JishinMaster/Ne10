@@ -31,6 +31,7 @@
 
 #define MATRICES 3
 
+#ifdef NE10_ENABLE_MATH
 static void initialise_matrix_column(ne10_mat_row3f *col);
 static void initialise_matrix(ne10_mat3x3f_t *mat);
 
@@ -95,3 +96,4 @@ void initialise_matrix_column(ne10_mat_row3f *col)
     col->r2 = (ne10_float32_t)rand() / RAND_MAX * 5.0f;
     col->r3 = (ne10_float32_t)rand() / RAND_MAX * 5.0f;
 }
+#endif

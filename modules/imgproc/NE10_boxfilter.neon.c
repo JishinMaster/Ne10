@@ -32,7 +32,11 @@
 #include "NE10.h"
 #include <stdlib.h>
 #include <math.h>
+
+#ifndef USE_AVX2
 #include <arm_neon.h>
+#endif
+
 #include <stdio.h>
 
 extern void ne10_img_boxfilter_row_border (const ne10_uint8_t* src,

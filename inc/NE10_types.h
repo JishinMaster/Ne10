@@ -39,6 +39,10 @@
 #include <assert.h>
 #include <stdint.h>
 
+#ifdef __SSE2__
+#include "NEON_2_SSE.h"
+#endif
+
 /**
  * @TODO Move the definition of NE10_UNROLL_LEVEL to cmake configuration files.
  * Macro NE10_UNROLL_LEVEL controls algorithm of FFT funtions.

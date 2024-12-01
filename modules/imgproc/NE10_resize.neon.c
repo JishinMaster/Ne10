@@ -25,7 +25,9 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef USE_AVX2
 #include <arm_neon.h>
+#endif
 
 #include "NE10.h"
 #include "NE10_mask_table.h"

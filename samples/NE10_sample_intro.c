@@ -37,6 +37,7 @@
  * a function.
  */
 
+#ifdef NE10_ENABLE_MATH
 /*
  * A simple example of using `ne10_addc_float`, an Ne10 function pointer that
  * gets dynamically initialised to the most appropriate function for the hardware.
@@ -93,12 +94,13 @@ void test_add_static(void)
         printf("\tne10_addc_float_neon:\t%f + %f = %f\n", src[i], cst, dst_neon[i]);
     }
 }
-
+#endif
 /*
  * The entry point of this sample program (like `main` in regular C).
  */
 int intro_sample_main(void)
 {
+#ifdef NE10_ENABLE_MATH
     // Initialise Ne10, using hardware auto-detection to set function pointers such as
     // `ne10_addc_float` to point to the Ne10 code best optimised for this machine. (There
     // is no need to do this if the C or NEON versions of all Ne10 functions are called
@@ -111,6 +113,6 @@ int intro_sample_main(void)
 
     test_add_dynamic();
     test_add_static();
-
+#endif
     return 0;
 }

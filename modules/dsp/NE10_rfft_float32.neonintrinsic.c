@@ -44,7 +44,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  * NE10 Library : dsp/NE10_rfft_float32.neonintrinsic.c
  */
 
+#ifndef USE_AVX2
 #include <arm_neon.h>
+#endif
 
 #include "NE10_types.h"
 #include "NE10_macros.h"
@@ -99,7 +101,7 @@ NE10_INLINE void ne10_radix8x4_c2r_neon (ne10_fft_cpx_float32_t *Fout,
     NE10_DECLARE_8(float32x4_t,q_in);
     NE10_DECLARE_8(float32x4_t,q_out);
 
-    const ne10_float32_t one_by_N = 0.25 / nfft;
+    const ne10_float32_t one_by_N = 0.25f / nfft;
     const float32x4_t one_by_N_neon = vdupq_n_f32(one_by_N);
 
     const float32x4_t *Fin_neon  = (float32x4_t*) Fin;
@@ -174,7 +176,7 @@ NE10_INLINE void ne10_radix4x4_c2r_neon (ne10_fft_cpx_float32_t *Fout,
     const float32x4_t *Fin_neon  = (float32x4_t*) Fin;
           float32x4_t *Fout_neon = (float32x4_t*) Fout;
 
-    const ne10_float32_t one_by_N = 0.25 / nfft;
+    const ne10_float32_t one_by_N = 0.25f / nfft;
     const float32x4_t one_by_N_neon = vdupq_n_f32(one_by_N);
 
     for (f_count = 0; f_count < fstride; f_count ++)

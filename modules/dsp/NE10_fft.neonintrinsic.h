@@ -34,7 +34,10 @@
 
 #include "NE10_fft.h"
 #include <stdio.h>
+
+#ifndef USE_AVX2
 #include <arm_neon.h>
+#endif
 
 #define NE10_CPX_ADD_NEON_F32(Z,A,B) do {           \
     Z.val[0] = A.val[0] + B.val[0];    \

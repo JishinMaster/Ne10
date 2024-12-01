@@ -29,7 +29,9 @@
  * NE10 Library : dsp/NE10_fft_int32.neon.c
  */
 
+#ifndef USE_AVX2
 #include <arm_neon.h>
+#endif
 
 #include "NE10_types.h"
 #include "NE10_macros.h"

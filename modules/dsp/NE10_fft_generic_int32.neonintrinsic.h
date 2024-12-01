@@ -147,6 +147,15 @@ static inline void NE10_CPX_MUL_NEON_S32 (CPLX &result, const CPLX A, const CPLX
         result.val[1] = ARBI + AIBR;
 }
 
+#ifdef __SSE2__
+#define i32x2_0(a) a.m64_i32[0]
+#define i32x2_1(a) a.m64_i32[1]
+#else
+#define i32x2_0(a) a[0]
+#define i32x2_1(a) a[1]
+#endif
+
+
 template<int RADIX>
 inline void NE10_LOAD_TW_AND_MUL (CPLX scratch_in[RADIX],
         const ne10_fft_cpx_int32_t *ptr_in,
@@ -155,8 +164,8 @@ inline void NE10_LOAD_TW_AND_MUL (CPLX scratch_in[RADIX],
     CPLX scratch_tw;
     int32x2_t d2_tmp = vld1_s32 ((ne10_int32_t *)(ptr_in + (RADIX - 2) * step));
 
-    scratch_tw.val[0] = NE10_REAL_DUP_NEON_S32 (d2_tmp[0]);
-    scratch_tw.val[1] = NE10_REAL_DUP_NEON_S32 (d2_tmp[1]);
+    scratch_tw.val[0] = NE10_REAL_DUP_NEON_S32 (i32x2_0(d2_tmp));
+    scratch_tw.val[1] = NE10_REAL_DUP_NEON_S32 (i32x2_1(d2_tmp));
     NE10_CPX_MUL_NEON_S32 (scratch_in[RADIX - 1], scratch_in[RADIX - 1], scratch_tw);
 
     NE10_LOAD_TW_AND_MUL<RADIX - 1> (scratch_in, ptr_in, step);
@@ -193,13 +202,17 @@ struct NE10_FFT_SCALING {
     inline void operator() (CPLX scratch_out[RADIX])
     {
 #ifdef NE10_DSP_CFFT_SCALING
+#ifdef NEON2SSE_DISABLE_PERFORMANCE_WARNING
+		const int32x4_t one_by_RADIX = _mm_set1_epi32((int32_t) floorf(1.0f / RADIX * NE10_F2I32_MAX + 0.5f));
+#else
         const int32x4_t one_by_RADIX =
         {
-            (ne10_int32_t) floor(1.0 / RADIX * NE10_F2I32_MAX + 0.5f),
-            (ne10_int32_t) floor(1.0 / RADIX * NE10_F2I32_MAX + 0.5f),
-            (ne10_int32_t) floor(1.0 / RADIX * NE10_F2I32_MAX + 0.5f),
-            (ne10_int32_t) floor(1.0 / RADIX * NE10_F2I32_MAX + 0.5f)
+            (ne10_int32_t) floorf(1.0f / RADIX * NE10_F2I32_MAX + 0.5f),
+            (ne10_int32_t) floorf(1.0f / RADIX * NE10_F2I32_MAX + 0.5f),
+            (ne10_int32_t) floorf(1.0f / RADIX * NE10_F2I32_MAX + 0.5f),
+            (ne10_int32_t) floorf(1.0f / RADIX * NE10_F2I32_MAX + 0.5f)
         };
+#endif
         scratch_out[SIZE - 1].val[0] = vqrdmulhq_s32 (scratch_out[SIZE - 1].val[0], one_by_RADIX);
         scratch_out[SIZE - 1].val[1] = vqrdmulhq_s32 (scratch_out[SIZE - 1].val[1], one_by_RADIX);
         NE10_FFT_SCALING<RADIX, SIZE - 1> () (scratch_out);
@@ -212,13 +225,17 @@ struct NE10_FFT_SCALING<RADIX, 1> {
     inline void operator () (CPLX scratch_out[1])
     {
 #ifdef NE10_DSP_CFFT_SCALING
+#ifdef __SSE2__
+		const int32x4_t one_by_RADIX = _mm_set1_epi32((int32_t)floorf(1.0f / RADIX * NE10_F2I32_MAX + 0.5f));
+#else
         const int32x4_t one_by_RADIX =
         {
-            (ne10_int32_t) floor(1.0 / RADIX * NE10_F2I32_MAX + 0.5f),
-            (ne10_int32_t) floor(1.0 / RADIX * NE10_F2I32_MAX + 0.5f),
-            (ne10_int32_t) floor(1.0 / RADIX * NE10_F2I32_MAX + 0.5f),
-            (ne10_int32_t) floor(1.0 / RADIX * NE10_F2I32_MAX + 0.5f)
+            (ne10_int32_t) floorf(1.0f / RADIX * NE10_F2I32_MAX + 0.5f),
+            (ne10_int32_t) floorf(1.0f / RADIX * NE10_F2I32_MAX + 0.5f),
+            (ne10_int32_t) floorf(1.0f / RADIX * NE10_F2I32_MAX + 0.5f),
+            (ne10_int32_t) floorf(1.0f / RADIX * NE10_F2I32_MAX + 0.5f)
         };
+#endif
         scratch_out[0].val[0] = vqrdmulhq_s32 (scratch_out[0].val[0], one_by_RADIX);
         scratch_out[0].val[1] = vqrdmulhq_s32 (scratch_out[0].val[1], one_by_RADIX);
 #endif
@@ -239,8 +256,12 @@ inline void NE10_CPX_SUB_NEON_S32 (CPLX &result, const CPLX a, const CPLX b)
 
 inline REAL NE10_HALF (REAL src)
 {
-    const int32x4_t CONST_HALF_NEON = { -1, -1, -1, -1};
-    src = vshlq_s32 (src, CONST_HALF_NEON);
+	#ifdef __SSE2__
+	 const int32x4_t CONST_HALF_NEON =_mm_set1_epi32(-1);
+	#else
+    const int32x4_t CONST_HALF_NEON = { -1, -1, -1, -1 };
+    #endif
+	src = vshlq_s32 (src, CONST_HALF_NEON);
     return src;
 }
 
